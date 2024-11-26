@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Requests\TaskRequest;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -21,8 +22,7 @@ Route::get('/task/create', function () {
     return view('create');
 })->name('task.create');
 
-Route::get('/task/{id}', function ($id) {
-    $task = Task::findOrFail($id);
+Route::get('/task/{task}', function (Task $task) {
 
     if (!$task) {
         abort(Response::HTTP_NOT_FOUND);
@@ -31,20 +31,33 @@ Route::get('/task/{id}', function ($id) {
     return view('show', ['task' => $task]);
 })->name('task.show');
 
-Route::post('/task/create', function (Request $req) {
-    // dd($req->all());
+Route::get('/task/{task}/edit', function (Task $task) {
 
-    $data = $req->validate([
-        'title' => 'required|string|max:255|min:3',
-        'description' => 'required|string|min:3',
-        'long_description' => 'nullable|string',
-    ]);
+    if (!$task) {
+        abort(Response::HTTP_NOT_FOUND);
+    }
 
-    $newTask = new Task();
-    $newTask->title = $data['title'];
-    $newTask->description = $data['description'];
-    $newTask->long_description = $data['long_description'];
-    $newTask->save();
+    return view('edit', ['task' => $task]);
+})->name('task.edit');
 
-    return redirect()->route('task.show', ['id' => $newTask->id]);
+Route::post('/tasks', function (TaskRequest $req) {
+    // dd('Request reached successfully');
+
+    $newTask = Task::create($req->validated());
+    return redirect()->route('task.show', ['task' => $newTask->id])
+        ->with('success', 'Task created successfully!');
 })->name('task.store');
+
+
+Route::put('/task/{task}', function (TaskRequest $req, Task $task) {
+    $task->update($req->validated());
+    return redirect()->route('task.show', ['task' => $task->id])
+        ->with('success', 'Task updated successfully!');
+})->name('task.update');
+
+Route::delete('/task/{task}', function (Task $task) {
+    $task->delete();
+
+    return redirect()->route('task.index')
+        ->with('success', 'Task deleted successfully!');
+})->name('task.destroy');
