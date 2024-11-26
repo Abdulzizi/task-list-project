@@ -16,11 +16,8 @@ This is a simple yet powerful task management app built using the Laravel framew
 ### Key Features:
 
 -   Add, edit, and delete tasks.
--   Categorize tasks for better organization.
 -   Mark tasks as completed or pending.
--   Simple user authentication (sign-up and login).
 -   Responsive design for mobile and desktop usage.
--   Task filtering by status (completed/pending).
 
 ## Installation
 
